@@ -1,4 +1,4 @@
-# SRS Requirements (Requirement ID, Actor, Description Only)
+# SRS Requirements 
 
 ## Functional Requirements
 
