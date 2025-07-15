@@ -1,54 +1,319 @@
-# SRS Requirements Table
+# SRS Requirements (Field-Row Format)
 
 ## Functional Requirements
 
-| ID     | Category/Module           | Description | Inputs | Outputs |
-|--------|--------------------------|-------------|---------|---------|
-| FR-01  | Employee Management      | Admin can insert new employee records. | Employee Name, Contact Information, Initial Job Role, Salary details. | Confirmation of record creation. |
-| FR-02  | Employee Management      | Admin can delete existing employee records. | Employee Unique Identifier. | Confirmation of record deletion. |
-| FR-03  | Employee Management      | Admin can update employee details (name, position, salary, etc.). | Employee Unique Identifier, updated employee details. | Confirmation of record update. |
-| FR-04  | Employee Management      | System assigns a unique identifier to each employee. | - | Unique Employee ID. |
-| FR-05  | Job Role Management      | Admin can modify employee job roles or positions. | Employee Unique Identifier, new Job Role/Position. | Confirmation of job role update. |
-| FR-06  | Job Role Management      | System maintains a list of valid job roles. | New Job Role, Edited Job Role, Job Role to Delete (for Admin). | List of valid job roles. |
-| FR-07  | Attendance Tracking      | System allows HR to track and log daily attendance. | Employee Unique Identifier, Date, Attendance Status. | Confirmation of attendance logged. |
-| FR-08  | Attendance Tracking      | System stores attendance history for each employee. | - | Stored attendance records. |
-| FR-09  | Payroll Management       | System calculates salary based on attendance and salary structure. | Employee Unique Identifier, Payroll Period, Attendance Records, Salary Structure. | Calculated Gross Salary. |
-| FR-10  | Payroll Management       | System includes bonuses and deductions in salary calculations. | Bonuses, Deductions. | Salary with bonuses and deductions applied. |
-| FR-11  | Payroll Management       | System processes and generates payroll periodically. | Payroll Period (e.g., monthly). | Generated payroll summaries/reports. |
-| FR-12  | Salary Management        | System manages and stores predefined salary structures. | Salary Structure Name, Components (for Admin). | List of predefined salary structures. |
-| FR-13  | Salary Management        | Admin can modify salary components (basic pay, bonuses, deductions). | Salary Structure Identifier, updated components. | Confirmation of salary component update. |
-| FR-14  | Data Handling            | System stores all data using file handling techniques. | - | Data written to files. |
-| FR-15  | Data Handling            | System retrieves and displays stored data on request. | Data retrieval request. | Retrieved and displayed data. |
-| FR-16  | Data Handling            | System ensures data integrity during file operations. | - | Error messages on data integrity issues. |
-| FR-17  | User Interface           | System provides a menu-driven, user-friendly interface. | - | Interactive menu. |
-| FR-18  | User Interface           | Users can navigate to employee list, attendance, payroll options easily. | - | Navigable menu options. |
-| FR-19  | Reporting & Viewing      | HR can view a list of all employees. | Request to view employee list. | Displayed list of employees. |
-| FR-20  | Reporting & Viewing      | System displays individual employee attendance and payroll summaries. | Employee Unique Identifier, Request for attendance/payroll summary. | Displayed individual attendance history and payroll summary. |
-| FR-21  | User Authentication      | System requires login for Admin and HR users. | Username, Password. | Authentication status, access granted/denied. |
-| FR-22  | User Authorization       | System restricts access to features based on user role (Admin vs HR). | User role, requested feature. | Access granted/denied based on role. |
-| FR-23  | Data Backup & Recovery   | System allows Admin to back up and restore data files. | Backup request, file selection. | Backup confirmation, restored data. |
-| FR-24  | Audit Logging            | System logs critical actions (e.g., record creation, deletion, payroll processing). | Action performed, user, timestamp. | Log entry created. |
-| FR-25  | Search & Filter          | System allows searching/filtering employees by name, role, or other criteria. | Search criteria, filter parameters. | Filtered employee list. |
-| FR-26  | Error Handling           | System validates user input and displays meaningful error messages. | User input. | Validation result, error message if invalid. |
-| FR-27  | Export/Print Reports     | System can export or print employee lists, attendance, or payroll summaries. | Export request, report type, format. | Exported/printed report. |
-| FR-28  | Date/Time Management     | System records timestamps for attendance and payroll processing. | Action performed. | Timestamp recorded. |
+ID - FR-01  
+Category/Module - Employee Management  
+Description - Admin can insert new employee records.  
+Inputs - Employee Name, Contact Information, Initial Job Role, Salary details.  
+Outputs - Confirmation of record creation.
+
+---
+
+ID - FR-02  
+Category/Module - Employee Management  
+Description - Admin can delete existing employee records.  
+Inputs - Employee Unique Identifier.  
+Outputs - Confirmation of record deletion.
+
+---
+
+ID - FR-03  
+Category/Module - Employee Management  
+Description - Admin can update employee details (name, position, salary, etc.).  
+Inputs - Employee Unique Identifier, updated employee details.  
+Outputs - Confirmation of record update.
+
+---
+
+ID - FR-04  
+Category/Module - Employee Management  
+Description - System assigns a unique identifier to each employee.  
+Inputs - -  
+Outputs - Unique Employee ID.
+
+---
+
+ID - FR-05  
+Category/Module - Job Role Management  
+Description - Admin can modify employee job roles or positions.  
+Inputs - Employee Unique Identifier, new Job Role/Position.  
+Outputs - Confirmation of job role update.
+
+---
+
+ID - FR-06  
+Category/Module - Job Role Management  
+Description - System maintains a list of valid job roles.  
+Inputs - New Job Role, Edited Job Role, Job Role to Delete (for Admin).  
+Outputs - List of valid job roles.
+
+---
+
+ID - FR-07  
+Category/Module - Attendance Tracking  
+Description - System allows HR to track and log daily attendance.  
+Inputs - Employee Unique Identifier, Date, Attendance Status.  
+Outputs - Confirmation of attendance logged.
+
+---
+
+ID - FR-08  
+Category/Module - Attendance Tracking  
+Description - System stores attendance history for each employee.  
+Inputs - -  
+Outputs - Stored attendance records.
+
+---
+
+ID - FR-09  
+Category/Module - Payroll Management  
+Description - System calculates salary based on attendance and salary structure.  
+Inputs - Employee Unique Identifier, Payroll Period, Attendance Records, Salary Structure.  
+Outputs - Calculated Gross Salary.
+
+---
+
+ID - FR-10  
+Category/Module - Payroll Management  
+Description - System includes bonuses and deductions in salary calculations.  
+Inputs - Bonuses, Deductions.  
+Outputs - Salary with bonuses and deductions applied.
+
+---
+
+ID - FR-11  
+Category/Module - Payroll Management  
+Description - System processes and generates payroll periodically.  
+Inputs - Payroll Period (e.g., monthly).  
+Outputs - Generated payroll summaries/reports.
+
+---
+
+ID - FR-12  
+Category/Module - Salary Management  
+Description - System manages and stores predefined salary structures.  
+Inputs - Salary Structure Name, Components (for Admin).  
+Outputs - List of predefined salary structures.
+
+---
+
+ID - FR-13  
+Category/Module - Salary Management  
+Description - Admin can modify salary components (basic pay, bonuses, deductions).  
+Inputs - Salary Structure Identifier, updated components.  
+Outputs - Confirmation of salary component update.
+
+---
+
+ID - FR-14  
+Category/Module - Data Handling  
+Description - System stores all data using file handling techniques.  
+Inputs - -  
+Outputs - Data written to files.
+
+---
+
+ID - FR-15  
+Category/Module - Data Handling  
+Description - System retrieves and displays stored data on request.  
+Inputs - Data retrieval request.  
+Outputs - Retrieved and displayed data.
+
+---
+
+ID - FR-16  
+Category/Module - Data Handling  
+Description - System ensures data integrity during file operations.  
+Inputs - -  
+Outputs - Error messages on data integrity issues.
+
+---
+
+ID - FR-17  
+Category/Module - User Interface  
+Description - System provides a menu-driven, user-friendly interface.  
+Inputs - -  
+Outputs - Interactive menu.
+
+---
+
+ID - FR-18  
+Category/Module - User Interface  
+Description - Users can navigate to employee list, attendance, payroll options easily.  
+Inputs - -  
+Outputs - Navigable menu options.
+
+---
+
+ID - FR-19  
+Category/Module - Reporting & Viewing  
+Description - HR can view a list of all employees.  
+Inputs - Request to view employee list.  
+Outputs - Displayed list of employees.
+
+---
+
+ID - FR-20  
+Category/Module - Reporting & Viewing  
+Description - System displays individual employee attendance and payroll summaries.  
+Inputs - Employee Unique Identifier, Request for attendance/payroll summary.  
+Outputs - Displayed individual attendance history and payroll summary.
+
+---
+
+ID - FR-21  
+Category/Module - User Authentication  
+Description - System requires login for Admin and HR users.  
+Inputs - Username, Password.  
+Outputs - Authentication status, access granted/denied.
+
+---
+
+ID - FR-22  
+Category/Module - User Authorization  
+Description - System restricts access to features based on user role (Admin vs HR).  
+Inputs - User role, requested feature.  
+Outputs - Access granted/denied based on role.
+
+---
+
+ID - FR-23  
+Category/Module - Data Backup & Recovery  
+Description - System allows Admin to back up and restore data files.  
+Inputs - Backup request, file selection.  
+Outputs - Backup confirmation, restored data.
+
+---
+
+ID - FR-24  
+Category/Module - Audit Logging  
+Description - System logs critical actions (e.g., record creation, deletion, payroll processing).  
+Inputs - Action performed, user, timestamp.  
+Outputs - Log entry created.
+
+---
+
+ID - FR-25  
+Category/Module - Search & Filter  
+Description - System allows searching/filtering employees by name, role, or other criteria.  
+Inputs - Search criteria, filter parameters.  
+Outputs - Filtered employee list.
+
+---
+
+ID - FR-26  
+Category/Module - Error Handling  
+Description - System validates user input and displays meaningful error messages.  
+Inputs - User input.  
+Outputs - Validation result, error message if invalid.
+
+---
+
+ID - FR-27  
+Category/Module - Export/Print Reports  
+Description - System can export or print employee lists, attendance, or payroll summaries.  
+Inputs - Export request, report type, format.  
+Outputs - Exported/printed report.
+
+---
+
+ID - FR-28  
+Category/Module - Date/Time Management  
+Description - System records timestamps for attendance and payroll processing.  
+Inputs - Action performed.  
+Outputs - Timestamp recorded.
+
+---
 
 ## Non-Functional Requirements
 
-| ID     | Category           | Description |
-|--------|--------------------|-------------|
-| NFR-01 | Performance        | The system should respond to user actions within 2 seconds for all menu operations. |
-| NFR-02 | Performance        | File operations (read/write) should complete within 3 seconds for up to 1000 employee records. |
-| NFR-03 | Reliability        | The system should not lose or corrupt data during normal operations or unexpected shutdowns. |
-| NFR-04 | Availability       | The system should be available for use at least 99% of the time during business hours. |
-| NFR-05 | Usability          | The user interface should be intuitive and require no more than 1 hour of training for a new user. |
-| NFR-06 | Usability          | Error messages should be clear and guide the user to resolve issues. |
-| NFR-07 | Security           | Only authorized users (Admin, HR) should access the system's features. |
-| NFR-08 | Security           | User passwords (if implemented) should not be stored in plain text. |
-| NFR-09 | Security           | Sensitive data should be protected from unauthorized access. |
-| NFR-10 | Maintainability    | The code should be modular and well-commented to facilitate future updates. |
-| NFR-11 | Maintainability    | System configuration (e.g., file paths, backup locations) should be easy to modify. |
-| NFR-12 | Portability        | The system should run on any Linux-based environment with a standard C compiler. |
-| NFR-13 | Scalability        | The system should support up to 1000 employee records without significant performance degradation. |
-| NFR-14 | Backup & Recovery  | The system should provide mechanisms for regular data backup and easy recovery. |
-| NFR-15 | Compliance         | The system should comply with relevant data protection and privacy regulations, if applicable. | 
+ID - NFR-01  
+Category - Performance  
+Description - The system should respond to user actions within 2 seconds for all menu operations.
+
+---
+
+ID - NFR-02  
+Category - Performance  
+Description - File operations (read/write) should complete within 3 seconds for up to 1000 employee records.
+
+---
+
+ID - NFR-03  
+Category - Reliability  
+Description - The system should not lose or corrupt data during normal operations or unexpected shutdowns.
+
+---
+
+ID - NFR-04  
+Category - Availability  
+Description - The system should be available for use at least 99% of the time during business hours.
+
+---
+
+ID - NFR-05  
+Category - Usability  
+Description - The user interface should be intuitive and require no more than 1 hour of training for a new user.
+
+---
+
+ID - NFR-06  
+Category - Usability  
+Description - Error messages should be clear and guide the user to resolve issues.
+
+---
+
+ID - NFR-07  
+Category - Security  
+Description - Only authorized users (Admin, HR) should access the system's features.
+
+---
+
+ID - NFR-08  
+Category - Security  
+Description - User passwords (if implemented) should not be stored in plain text.
+
+---
+
+ID - NFR-09  
+Category - Security  
+Description - Sensitive data should be protected from unauthorized access.
+
+---
+
+ID - NFR-10  
+Category - Maintainability  
+Description - The code should be modular and well-commented to facilitate future updates.
+
+---
+
+ID - NFR-11  
+Category - Maintainability  
+Description - System configuration (e.g., file paths, backup locations) should be easy to modify.
+
+---
+
+ID - NFR-12  
+Category - Portability  
+Description - The system should run on any Linux-based environment with a standard C compiler.
+
+---
+
+ID - NFR-13  
+Category - Scalability  
+Description - The system should support up to 1000 employee records without significant performance degradation.
+
+---
+
+ID - NFR-14  
+Category - Backup & Recovery  
+Description - The system should provide mechanisms for regular data backup and easy recovery.
+
+---
+
+ID - NFR-15  
+Category - Compliance  
+Description - The system should comply with relevant data protection and privacy regulations, if applicable.
+
+--- 
