@@ -9,7 +9,6 @@
 #define MAX_ATTENDANCE 500
 #define MAX_STRING 50
 
-// Data Structures
 typedef struct
 {
     int emp_id;
@@ -33,22 +32,20 @@ Attendance attendance_records[MAX_ATTENDANCE];
 int employee_count = 0;
 int attendance_count = 0;
 
-// Function declarations
 void show_menu();       // Nazifa
 void add_employee();    // Ridwan
 void view_employees();  // Nazifa
 void update_employee(); // Ridwan
-void delete_employee();
+void delete_employee(); // Moballig
 void mark_daily_attendance(); // Shams
 void view_attendance();       // Ridwan
 void calculate_payroll();     // Shams
-void save_to_file();
-void load_from_file();
+void save_to_file();    // Moballig
+void load_from_file();  // Moballig
 int get_next_id();   // Nazifa
 void pause();        // Shams
 void clear_screen(); // Shams
 
-// Main Function
 int main() // Nazifa
 {
     load_from_file();
@@ -104,15 +101,6 @@ int main() // Nazifa
     } while (choice != 8);
 
     return 0;
-}
-
-void clear_screen()
-{
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
 }
 
 /*void show_menu()
@@ -189,7 +177,6 @@ void show_menu()
     printf("╚═════════════════════════════════╝ ╚═════════════════════════════════╝\n");
 }
 
-// Employee Management Functions
 void add_employee()
 {
     if (employee_count >= MAX_EMPLOYEES)
@@ -349,7 +336,217 @@ void delete_employee()
     }
 }
 
-// Attendance Management Functions
+void view_attendance()
+{
+    printf("\n============================================\n");
+    printf("           ATTENDANCE RECORDS              \n");
+    printf("============================================\n");
+    if (attendance_count == 0)
+    {
+        printf("No attendance records found!\n");
+        return;
+    }
+
+    printf("%-8s %-25s %-12s %-8s %-10s %-15s\n",
+           "Emp ID", "Employee Name", "Date", "Hours", "Status", "Absence Type");
+    printf("--------------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < attendance_count; i++)
+    {
+        char emp_name[MAX_STRING] = "Unknown";
+        for (int j = 0; j < employee_count; j++)
+        {
+            if (employees[j].emp_id == attendance_records[i].emp_id)
+            {
+                strcpy(emp_name, employees[j].name);
+                break;
+            }
+        }
+
+        printf("%-8.3d %-25s %-12s %-8.2f %-10s",
+               attendance_records[i].emp_id,
+               emp_name,
+               attendance_records[i].date,
+               attendance_records[i].hours_worked,
+               attendance_records[i].present ? "Present" : "Absent");
+
+        if (!attendance_records[i].present)
+        {
+            printf(" %-15s", attendance_records[i].excused ? "Excused" : "Unexcused");
+        }
+        else
+        {
+            printf(" %-15s", "N/A");
+        }
+        printf("\n");
+    }
+    printf("--------------------------------------------------------------------------------\n");
+}
+
+void save_to_file()
+{
+    FILE *emp_file = fopen("employees.txt", "w");
+    if (emp_file)
+    {
+        fprintf(emp_file, "Employee Management System - Employee Records\n");
+        fprintf(emp_file, "==============================================\n");
+        fprintf(emp_file, "Total Employees: %d\n\n", employee_count);
+
+        fprintf(emp_file, "%-5s %-25s %-20s %-15s %-8s\n",
+                "ID", "Name", "Position", "Hourly Rate", "Status");
+        fprintf(emp_file, "-----------------------------------------------------------------------\n");
+
+        for (int i = 0; i < employee_count; i++)
+        {
+            fprintf(emp_file, "%-5.3d %-25s %-20s $%-14.2f %-8s\n",
+                    employees[i].emp_id,
+                    employees[i].name,
+                    employees[i].position,
+                    employees[i].hourly_salary,
+                    employees[i].is_active ? "Active" : "Inactive");
+        }
+        fprintf(emp_file, "-----------------------------------------------------------------------\n");
+
+        fprintf(emp_file, "\n\nRaw Data (for system loading):\n");
+        fprintf(emp_file, "%d\n", employee_count);
+        for (int i = 0; i < employee_count; i++)
+        {
+            fprintf(emp_file, "%03d|%s|%s|%.2f|%d\n",
+                    employees[i].emp_id,
+                    employees[i].name,
+                    employees[i].position,
+                    employees[i].hourly_salary,
+                    employees[i].is_active);
+        }
+        fclose(emp_file);
+    }
+
+    FILE *att_file = fopen("attendance.txt", "w");
+    if (att_file)
+    {
+        fprintf(att_file, "Employee Management System - Attendance Records\n");
+        fprintf(att_file, "================================================\n");
+        fprintf(att_file, "Total Records: %d\n\n", attendance_count);
+
+        fprintf(att_file, "%-8s %-25s %-12s %-8s %-10s %-15s\n",
+                "Emp ID", "Employee Name", "Date", "Hours", "Status", "Absence Type");
+        fprintf(att_file, "--------------------------------------------------------------------------------\n");
+
+        for (int i = 0; i < attendance_count; i++)
+        {
+            char emp_name[MAX_STRING] = "Unknown";
+            for (int j = 0; j < employee_count; j++)
+            {
+                if (employees[j].emp_id == attendance_records[i].emp_id)
+                {
+                    strcpy(emp_name, employees[j].name);
+                    break;
+                }
+            }
+
+            fprintf(att_file, "%-8.3d %-25s %-12s %-8.2f %-10s %-15s\n",
+                    attendance_records[i].emp_id,
+                    emp_name,
+                    attendance_records[i].date,
+                    attendance_records[i].hours_worked,
+                    attendance_records[i].present ? "Present" : "Absent",
+                    !attendance_records[i].present ? (attendance_records[i].excused ? "Excused" : "Unexcused") : "N/A");
+        }
+        fprintf(att_file, "--------------------------------------------------------------------------------\n");
+
+        fprintf(att_file, "\n\nRaw Data (for system loading):\n");
+        fprintf(att_file, "%d\n", attendance_count);
+        for (int i = 0; i < attendance_count; i++)
+        {
+            fprintf(att_file, "%03d|%s|%.2f|%d|%d\n",
+                    attendance_records[i].emp_id,
+                    attendance_records[i].date,
+                    attendance_records[i].hours_worked,
+                    attendance_records[i].present,
+                    attendance_records[i].excused);
+        }
+        fclose(att_file);
+    }
+}
+
+void load_from_file()
+{
+    FILE *emp_file = fopen("employees.txt", "r");
+    if (emp_file)
+    {
+        char line[256];
+        int found_raw_data = 0;
+
+        while (fgets(line, sizeof(line), emp_file))
+        {
+            if (strstr(line, "Raw Data (for system loading):"))
+            {
+                found_raw_data = 1;
+                break;
+            }
+        }
+
+        if (found_raw_data)
+        {
+            fscanf(emp_file, "%d", &employee_count);
+            for (int i = 0; i < employee_count; i++)
+            {
+                fscanf(emp_file, "%d|%49[^|]|%49[^|]|%f|%d",
+                       &employees[i].emp_id,
+                       employees[i].name,
+                       employees[i].position,
+                       &employees[i].hourly_salary,
+                       &employees[i].is_active);
+            }
+        }
+        fclose(emp_file);
+    }
+
+    FILE *att_file = fopen("attendance.txt", "r");
+    if (att_file)
+    {
+        char line[256];
+        int found_raw_data = 0;
+
+        while (fgets(line, sizeof(line), att_file))
+        {
+            if (strstr(line, "Raw Data (for system loading):"))
+            {
+                found_raw_data = 1;
+                break;
+            }
+        }
+
+        if (found_raw_data)
+        {
+            fscanf(att_file, "%d", &attendance_count);
+            for (int i = 0; i < attendance_count; i++)
+            {
+                fscanf(att_file, "%d|%14[^|]|%f|%d|%d",
+                       &attendance_records[i].emp_id,
+                       attendance_records[i].date,
+                       &attendance_records[i].hours_worked,
+                       &attendance_records[i].present,
+                       &attendance_records[i].excused);
+            }
+        }
+        fclose(att_file);
+    }
+}
+
+int get_next_id()
+{
+    int max_id = 0;
+    for (int i = 0; i < employee_count; i++)
+    {
+        if (employees[i].emp_id > max_id)
+        {
+            max_id = employees[i].emp_id;
+        }
+    }
+    return max_id + 1;
+}
+
 void mark_daily_attendance()
 {
     printf("\n============================================\n");
@@ -594,54 +791,6 @@ void mark_daily_attendance()
     }
 }
 
-void view_attendance()
-{
-    printf("\n============================================\n");
-    printf("           ATTENDANCE RECORDS              \n");
-    printf("============================================\n");
-    if (attendance_count == 0)
-    {
-        printf("No attendance records found!\n");
-        return;
-    }
-
-    printf("%-8s %-25s %-12s %-8s %-10s %-15s\n",
-           "Emp ID", "Employee Name", "Date", "Hours", "Status", "Absence Type");
-    printf("--------------------------------------------------------------------------------\n");
-
-    for (int i = 0; i < attendance_count; i++)
-    {
-        char emp_name[MAX_STRING] = "Unknown";
-        for (int j = 0; j < employee_count; j++)
-        {
-            if (employees[j].emp_id == attendance_records[i].emp_id)
-            {
-                strcpy(emp_name, employees[j].name);
-                break;
-            }
-        }
-
-        printf("%-8.3d %-25s %-12s %-8.2f %-10s",
-               attendance_records[i].emp_id,
-               emp_name,
-               attendance_records[i].date,
-               attendance_records[i].hours_worked,
-               attendance_records[i].present ? "Present" : "Absent");
-
-        if (!attendance_records[i].present)
-        {
-            printf(" %-15s", attendance_records[i].excused ? "Excused" : "Unexcused");
-        }
-        else
-        {
-            printf(" %-15s", "N/A");
-        }
-        printf("\n");
-    }
-    printf("--------------------------------------------------------------------------------\n");
-}
-
-// Payroll and File Operations
 void calculate_payroll()
 {
     printf("\n============================================\n");
@@ -739,171 +888,13 @@ void calculate_payroll()
     printf("- Net pay cannot go below $0.00\n");
 }
 
-void save_to_file()
+void clear_screen()
 {
-    FILE *emp_file = fopen("employees.txt", "w");
-    if (emp_file)
-    {
-        fprintf(emp_file, "Employee Management System - Employee Records\n");
-        fprintf(emp_file, "==============================================\n");
-        fprintf(emp_file, "Total Employees: %d\n\n", employee_count);
-
-        fprintf(emp_file, "%-5s %-25s %-20s %-15s %-8s\n",
-                "ID", "Name", "Position", "Hourly Rate", "Status");
-        fprintf(emp_file, "-----------------------------------------------------------------------\n");
-
-        for (int i = 0; i < employee_count; i++)
-        {
-            fprintf(emp_file, "%-5.3d %-25s %-20s $%-14.2f %-8s\n",
-                    employees[i].emp_id,
-                    employees[i].name,
-                    employees[i].position,
-                    employees[i].hourly_salary,
-                    employees[i].is_active ? "Active" : "Inactive");
-        }
-        fprintf(emp_file, "-----------------------------------------------------------------------\n");
-
-        fprintf(emp_file, "\n\nRaw Data (for system loading):\n");
-        fprintf(emp_file, "%d\n", employee_count);
-        for (int i = 0; i < employee_count; i++)
-        {
-            fprintf(emp_file, "%03d|%s|%s|%.2f|%d\n",
-                    employees[i].emp_id,
-                    employees[i].name,
-                    employees[i].position,
-                    employees[i].hourly_salary,
-                    employees[i].is_active);
-        }
-        fclose(emp_file);
-    }
-
-    FILE *att_file = fopen("attendance.txt", "w");
-    if (att_file)
-    {
-        fprintf(att_file, "Employee Management System - Attendance Records\n");
-        fprintf(att_file, "================================================\n");
-        fprintf(att_file, "Total Records: %d\n\n", attendance_count);
-
-        fprintf(att_file, "%-8s %-25s %-12s %-8s %-10s %-15s\n",
-                "Emp ID", "Employee Name", "Date", "Hours", "Status", "Absence Type");
-        fprintf(att_file, "--------------------------------------------------------------------------------\n");
-
-        for (int i = 0; i < attendance_count; i++)
-        {
-            char emp_name[MAX_STRING] = "Unknown";
-            for (int j = 0; j < employee_count; j++)
-            {
-                if (employees[j].emp_id == attendance_records[i].emp_id)
-                {
-                    strcpy(emp_name, employees[j].name);
-                    break;
-                }
-            }
-
-            fprintf(att_file, "%-8.3d %-25s %-12s %-8.2f %-10s %-15s\n",
-                    attendance_records[i].emp_id,
-                    emp_name,
-                    attendance_records[i].date,
-                    attendance_records[i].hours_worked,
-                    attendance_records[i].present ? "Present" : "Absent",
-                    !attendance_records[i].present ? (attendance_records[i].excused ? "Excused" : "Unexcused") : "N/A");
-        }
-        fprintf(att_file, "--------------------------------------------------------------------------------\n");
-
-        fprintf(att_file, "\n\nRaw Data (for system loading):\n");
-        fprintf(att_file, "%d\n", attendance_count);
-        for (int i = 0; i < attendance_count; i++)
-        {
-            fprintf(att_file, "%03d|%s|%.2f|%d|%d\n",
-                    attendance_records[i].emp_id,
-                    attendance_records[i].date,
-                    attendance_records[i].hours_worked,
-                    attendance_records[i].present,
-                    attendance_records[i].excused);
-        }
-        fclose(att_file);
-    }
-}
-
-void load_from_file()
-{
-    FILE *emp_file = fopen("employees.txt", "r");
-    if (emp_file)
-    {
-        char line[256];
-        int found_raw_data = 0;
-
-        // Skip the formatted header and find raw data section
-        while (fgets(line, sizeof(line), emp_file))
-        {
-            if (strstr(line, "Raw Data (for system loading):"))
-            {
-                found_raw_data = 1;
-                break;
-            }
-        }
-
-        if (found_raw_data)
-        {
-            fscanf(emp_file, "%d", &employee_count);
-            for (int i = 0; i < employee_count; i++)
-            {
-                fscanf(emp_file, "%d|%49[^|]|%49[^|]|%f|%d",
-                       &employees[i].emp_id,
-                       employees[i].name,
-                       employees[i].position,
-                       &employees[i].hourly_salary,
-                       &employees[i].is_active);
-            }
-        }
-        fclose(emp_file);
-    }
-
-    FILE *att_file = fopen("attendance.txt", "r");
-    if (att_file)
-    {
-        char line[256];
-        int found_raw_data = 0;
-
-        // Skip the formatted header and find raw data section
-        while (fgets(line, sizeof(line), att_file))
-        {
-            if (strstr(line, "Raw Data (for system loading):"))
-            {
-                found_raw_data = 1;
-                break;
-            }
-        }
-
-        if (found_raw_data)
-        {
-            fscanf(att_file, "%d", &attendance_count);
-            for (int i = 0; i < attendance_count; i++)
-            {
-                fscanf(att_file, "%d|%14[^|]|%f|%d|%d",
-                       &attendance_records[i].emp_id,
-                       attendance_records[i].date,
-                       &attendance_records[i].hours_worked,
-                       &attendance_records[i].present,
-                       &attendance_records[i].excused);
-            }
-        }
-        fclose(att_file);
-    }
-}
-
-// Utility Functions
-int get_next_id()
-{
-    int max_id = 0;
-    for (int i = 0; i < employee_count; i++)
-    {
-        if (employees[i].emp_id > max_id)
-        {
-            max_id = employees[i].emp_id;
-        }
-    }
-    return max_id + 1;
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void pause()
