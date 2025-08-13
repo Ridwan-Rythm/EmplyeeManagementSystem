@@ -1,0 +1,11 @@
+Employee Management System - Attendance Records
+================================================
+Total Records: 0
+
+Emp ID   Employee Name             Date         Hours    Status     Absence Type   
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
+Raw Data (for system loading):
+0

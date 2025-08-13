@@ -1,0 +1,11 @@
+Employee Management System - Employee Records
+==============================================
+Total Employees: 0
+
+ID    Name                      Position             Hourly Rate     Status  
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+Raw Data (for system loading):
+0

@@ -8,6 +8,22 @@
 #define MAX_EMPLOYEES 100
 #define MAX_ATTENDANCE 500
 #define MAX_STRING 50
+#define MAX_USERS 10
+#define MAX_PASSWORD 20
+
+// User authentication structures
+typedef struct {
+    char username[MAX_STRING];
+    char password[MAX_PASSWORD];
+    char role[MAX_STRING];  // "HR" or "ADMIN"
+    int is_active;
+} User;
+
+// Global variables for authentication
+User users[MAX_USERS];
+int user_count = 0;
+User* current_user = NULL;
+int is_logged_in = 0;
 
 typedef struct
 {
@@ -32,6 +48,17 @@ Attendance attendance_records[MAX_ATTENDANCE];
 int employee_count = 0;
 int attendance_count = 0;
 
+// Authentication functions{Moballig}
+void initialize_default_users();
+int authenticate_user();
+void login_menu();
+void change_password();
+void logout();
+int has_permission(const char* required_role);
+void save_users_to_file();
+void load_users_from_file();
+
+// Main system functions
 void show_menu();       // Nazifa
 void add_employee();    // Ridwan
 void view_employees();  // Nazifa
@@ -48,57 +75,112 @@ void clear_screen(); // Shams
 
 int main() // Nazifa
 {
+    // Initialize authentication system
+    initialize_default_users();
+    load_users_from_file();
+    
+    // Load employee and attendance data
     load_from_file();
 
-    int choice;
-    do
+    // Main program loop
+    while (1)
     {
-        show_menu();
-        printf("\nEnter your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice)
+        if (!is_logged_in)
         {
-        case 1:
-            add_employee();
-            break;
-        case 2:
-            view_employees();
-            break;
-        case 3:
-            update_employee();
-            break;
-        case 4:
-            delete_employee();
-            break;
-        case 5:
-            mark_daily_attendance();
-            break;
-        case 6:
-            view_attendance();
-            break;
-        case 7:
-            calculate_payroll();
-            break;
-        case 8:
-            save_to_file();
-            printf("\n========================================\n");
-            printf("Data saved successfully!\n");
-            printf("Thank you for using Employee\n");
-            printf("Management System!\n");
-            printf("========================================\n");
-            break;
-        default:
-            printf("\nInvalid choice! Please try again.\n");
+            login_menu();
+            if (!is_logged_in)
+            {
+                printf("\nExiting system...\n");
+                break;
+            }
         }
-
-        if (choice != 8)
+        else
         {
-            pause();
-            clear_screen();
-        }
+            int choice;
+            do
+            {
+                show_menu();
+                printf("\nEnter your choice: ");
+                scanf("%d", &choice);
 
-    } while (choice != 8);
+                switch (choice)
+                {
+                case 1:
+                    if (has_permission("HR")) {
+                        add_employee();
+                    } else {
+                        printf("\nAccess denied! Only HR can add employees.\n");
+                    }
+                    break;
+                case 2:
+                    view_employees();
+                    break;
+                case 3:
+                    if (has_permission("HR") || has_permission("ADMIN")) {
+                        update_employee();
+                    } else {
+                        printf("\nAccess denied!\n");
+                    }
+                    break;
+                case 4:
+                    if (has_permission("HR")) {
+                        delete_employee();
+                    } else {
+                        printf("\nAccess denied! Only HR can delete employees.\n");
+                    }
+                    break;
+                case 5:
+                    if (has_permission("HR")) {
+                        mark_daily_attendance();
+                    } else {
+                        printf("\nAccess denied! Only HR can mark attendance.\n");
+                    }
+                    break;
+                case 6:
+                    view_attendance();
+                    break;
+                case 7:
+                    if (has_permission("HR")) {
+                        calculate_payroll();
+                    } else {
+                        printf("\nAccess denied! Only HR can calculate payroll.\n");
+                    }
+                    break;
+                case 8:
+                    save_to_file();
+                    printf("\n========================================\n");
+                    printf("Data saved successfully!\n");
+                    printf("Thank you for using Employee\n");
+                    printf("Management System!\n");
+                    printf("========================================\n");
+                    break;
+                case 9:
+                    change_password();
+                    break;
+                case 10:
+                    logout();
+                    break;
+                case 11:
+                    save_to_file();
+                    save_users_to_file();
+                    printf("\n========================================\n");
+                    printf("Data saved successfully!\n");
+                    printf("Thank you for using Employee\n");
+                    printf("Management System!\n");
+                    printf("========================================\n");
+                    return 0;
+                default:
+                    printf("\nInvalid choice! Please try again.\n");
+                }
+
+                if (choice != 8 && choice != 9 && choice != 10 && choice != 11)
+                {
+                    pause();
+                    clear_screen();
+                }
+            } while (choice != 8 && choice != 9 && choice != 10 && choice != 11);
+        }
+    }
 
     return 0;
 }
@@ -156,6 +238,16 @@ void show_menu()
     printf("██║ ╚═╝ ██║██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████╗██║  ██║\n");
     printf("╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝\n");
     printf("\n");
+    
+    // Display current user information
+    if (current_user && is_logged_in)
+    {
+        printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
+        printf("║  👤 Logged in as: %-15s | Role: %-10s                    ║\n", 
+               current_user->username, current_user->role);
+        printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+        printf("\n");
+    }
 
     printf("╔═════════════════════════════════╗ ╔═════════════════════════════════╗\n");
     printf("║  1. Add New Employee            ║ ║  2. View All Employees          ║\n");
@@ -173,8 +265,16 @@ void show_menu()
     printf("\n");
 
     printf("╔═════════════════════════════════╗ ╔═════════════════════════════════╗\n");
-    printf("║  7. Calculate Payroll           ║ ║  8. Save & Exit                 ║\n");
+    printf("║  7. Calculate Payroll           ║ ║  8. Save Data                   ║\n");
     printf("╚═════════════════════════════════╝ ╚═════════════════════════════════╝\n");
+    printf("\n");
+    printf("╔═════════════════════════════════╗ ╔═════════════════════════════════╗\n");
+    printf("║  9. Change Password             ║ ║  10. Logout                     ║\n");
+    printf("╚═════════════════════════════════╝ ╚═════════════════════════════════╝\n");
+    printf("\n");
+    printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║  11. Save & Exit                                                         ║\n");
+    printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
 }
 
 void add_employee()
@@ -902,4 +1002,266 @@ void pause()
     printf("\nPress Enter to continue... ");
     getchar();
     getchar();
+}
+
+// ============================================================================
+// AUTHENTICATION FUNCTIONS
+// ============================================================================
+
+void initialize_default_users()
+{
+    // Create default HR user
+    strcpy(users[0].username, "hr");
+    strcpy(users[0].password, "hr123");
+    strcpy(users[0].role, "HR");
+    users[0].is_active = 1;
+    
+    // Create default Admin user
+    strcpy(users[1].username, "admin");
+    strcpy(users[1].password, "admin123");
+    strcpy(users[1].role, "ADMIN");
+    users[1].is_active = 1;
+    
+    user_count = 2;
+}
+
+int authenticate_user()
+{
+    char username[MAX_STRING];
+    char password[MAX_PASSWORD];
+    
+    printf("\n============================================\n");
+    printf("              LOGIN SYSTEM                 \n");
+    printf("============================================\n");
+    
+    printf("Username: ");
+    scanf("%s", username);
+    
+    printf("Password: ");
+    scanf("%s", password);
+    
+    // Find user
+    for (int i = 0; i < user_count; i++)
+    {
+        if (users[i].is_active && 
+            strcmp(users[i].username, username) == 0 && 
+            strcmp(users[i].password, password) == 0)
+        {
+            current_user = &users[i];
+            is_logged_in = 1;
+            return 1;
+        }
+    }
+    
+    return 0;
+}
+
+void login_menu()
+{
+    clear_screen();
+    
+    printf("███████╗███╗   ███╗██████╗ ██╗      ██████╗ ██╗   ██╗███████╗███████╗\n");
+    printf("██╔════╝████╗ ████║██╔══██╗██║     ██╔═══██╗╚██╗ ██╔╝██╔════╝██╔════╝\n");
+    printf("█████╗  ██╔████╔██║██████╔╝██║     ██║   ██║ ╚████╔╝ █████╗  █████╗  \n");
+    printf("██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██║   ██║  ╚██╔╝  ██╔══╝  ██╔══╝  \n");
+    printf("███████╗██║ ╚═╝ ██║██║     ███████╗╚██████╔╝   ██║   ███████╗███████╗\n");
+    printf("╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝\n");
+    printf("\n");
+    printf("███╗   ███╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗██████╗ \n");
+    printf("████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝ ██╔════╝██╔══██╗\n");
+    printf("██╔████╔██║███████║██╔██╗ ██║███████║██║  ███╗█████╗  ██████╔╝\n");
+    printf("██║╚██╔╝██║██╔══██║██║╚██╗██║██╔══██║██║   ██║██╔══╝  ██╔══██╗\n");
+    printf("██║ ╚═╝ ██║██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████╗██║  ██║\n");
+    printf("╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝\n");
+    printf("\n");
+    printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                           EMPLOYEE MANAGEMENT SYSTEM                     ║\n");
+    printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
+    printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                              LOGIN REQUIRED                              ║\n");
+    printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
+    
+    int attempts = 0;
+    const int max_attempts = 3;
+    
+    while (attempts < max_attempts && !is_logged_in)
+    {
+        if (attempts > 0)
+        {
+            printf("\n❌ Login failed! Attempts remaining: %d\n", max_attempts - attempts);
+        }
+        
+        if (authenticate_user())
+        {
+            printf("\n✅ Login successful!\n");
+            printf("Welcome, %s (%s)!\n", current_user->username, current_user->role);
+            pause();
+            return;
+        }
+        else
+        {
+            attempts++;
+            if (attempts < max_attempts)
+            {
+                printf("\n❌ Invalid username or password!\n");
+                pause();
+                clear_screen();
+                
+                // Show login form again
+                printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
+                printf("║                              LOGIN REQUIRED                              ║\n");
+                printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+                printf("\n");
+            }
+        }
+    }
+    
+    if (attempts >= max_attempts)
+    {
+        printf("\n❌ Maximum login attempts exceeded. Exiting system...\n");
+        pause();
+    }
+}
+
+void change_password()
+{
+    char current_password[MAX_PASSWORD];
+    char new_password[MAX_PASSWORD];
+    char confirm_password[MAX_PASSWORD];
+    
+    printf("\n============================================\n");
+    printf("            CHANGE PASSWORD                 \n");
+    printf("============================================\n");
+    
+    printf("Current Password: ");
+    scanf("%s", current_password);
+    
+    // Verify current password
+    if (strcmp(current_user->password, current_password) != 0)
+    {
+        printf("\n❌ Current password is incorrect!\n");
+        return;
+    }
+    
+    printf("New Password: ");
+    scanf("%s", new_password);
+    
+    printf("Confirm New Password: ");
+    scanf("%s", confirm_password);
+    
+    // Check if passwords match
+    if (strcmp(new_password, confirm_password) != 0)
+    {
+        printf("\n❌ New passwords do not match!\n");
+        return;
+    }
+    
+    // Check password length
+    if (strlen(new_password) < 6)
+    {
+        printf("\n❌ Password must be at least 6 characters long!\n");
+        return;
+    }
+    
+    // Update password
+    strcpy(current_user->password, new_password);
+    printf("\n✅ Password changed successfully!\n");
+}
+
+void logout()
+{
+    printf("\n============================================\n");
+    printf("                 LOGOUT                     \n");
+    printf("============================================\n");
+    
+    printf("Goodbye, %s!\n", current_user->username);
+    current_user = NULL;
+    is_logged_in = 0;
+    
+    printf("You have been logged out successfully.\n");
+    pause();
+}
+
+int has_permission(const char* required_role)
+{
+    if (!current_user || !is_logged_in)
+        return 0;
+    
+    // Admin has access to everything
+    if (strcmp(current_user->role, "ADMIN") == 0)
+        return 1;
+    
+    // Check if user has the required role
+    return (strcmp(current_user->role, required_role) == 0);
+}
+
+void save_users_to_file()
+{
+    FILE *user_file = fopen("users.txt", "w");
+    if (user_file)
+    {
+        fprintf(user_file, "Employee Management System - User Accounts\n");
+        fprintf(user_file, "==========================================\n");
+        fprintf(user_file, "Total Users: %d\n\n", user_count);
+        
+        fprintf(user_file, "%-15s %-15s %-10s %-8s\n", "Username", "Password", "Role", "Status");
+        fprintf(user_file, "------------------------------------------------\n");
+        
+        for (int i = 0; i < user_count; i++)
+        {
+            fprintf(user_file, "%-15s %-15s %-10s %-8s\n",
+                    users[i].username,
+                    users[i].password,
+                    users[i].role,
+                    users[i].is_active ? "Active" : "Inactive");
+        }
+        fprintf(user_file, "------------------------------------------------\n");
+        
+        fprintf(user_file, "\n\nRaw Data (for system loading):\n");
+        fprintf(user_file, "%d\n", user_count);
+        for (int i = 0; i < user_count; i++)
+        {
+            fprintf(user_file, "%s|%s|%s|%d\n",
+                    users[i].username,
+                    users[i].password,
+                    users[i].role,
+                    users[i].is_active);
+        }
+        fclose(user_file);
+    }
+}
+
+void load_users_from_file()
+{
+    FILE *user_file = fopen("users.txt", "r");
+    if (user_file)
+    {
+        char line[256];
+        int found_raw_data = 0;
+        
+        while (fgets(line, sizeof(line), user_file))
+        {
+            if (strstr(line, "Raw Data (for system loading):"))
+            {
+                found_raw_data = 1;
+                break;
+            }
+        }
+        
+        if (found_raw_data)
+        {
+            fscanf(user_file, "%d", &user_count);
+            for (int i = 0; i < user_count; i++)
+            {
+                fscanf(user_file, "%49[^|]|%19[^|]|%49[^|]|%d",
+                       users[i].username,
+                       users[i].password,
+                       users[i].role,
+                       &users[i].is_active);
+            }
+        }
+        fclose(user_file);
+    }
 }
