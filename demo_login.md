@@ -149,3 +149,4 @@ gcc EMS_Final.c -o ems
 ---
 
 **Enjoy testing your new secure Employee Management System! 🎊**
+
