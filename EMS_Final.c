@@ -73,8 +73,7 @@ void clear_screen();          // Shams
 
 int main() // Nazifa
 {
-    // Initialize authentication system
-    initialize_default_users();
+
     load_users_from_file();
 
     // Load employee and attendance data
