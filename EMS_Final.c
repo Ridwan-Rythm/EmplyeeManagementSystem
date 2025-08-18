@@ -75,11 +75,8 @@ int main() // Nazifa
 {
 
     load_users_from_file();
-
-    // Load employee and attendance data
     load_from_file();
 
-    // Main program loop
     while (1)
     {
         if (!is_logged_in)
@@ -210,7 +207,6 @@ void show_menu()
     printf("    ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝\n");
     printf("\n");
 
-    // Display current user information
     if (current_user && is_logged_in)
     {
         printf("                                    ╔═════════════════════════════════════════════════════════════════════╗\n");
@@ -959,32 +955,36 @@ void pause()
     getchar();
 }
 
-// ============================================================================
 // AUTHENTICATION FUNCTIONS
-// ============================================================================
 
 int authenticate_user()
 {
     char username[MAX_STRING];
     char password[MAX_PASSWORD];
 
-
-    
     printf("\n============================================\n");
     printf("              LOGIN SYSTEM                 \n");
     printf("============================================\n");
-    
+
+    if (user_count == 0)
+    {
+        printf("ERROR: No user accounts found in users.txt!\n");
+        printf("Please ensure users.txt exists and contains valid user data.\n");
+        pause();
+    }
+
+    printf("Users loaded: %d accounts found\n", user_count);
+
     printf("Username: ");
     scanf("%s", username);
-    
+
     printf("Password: ");
     scanf("%s", password);
-    
-    // Find user
+
     for (int i = 0; i < user_count; i++)
     {
-        if (users[i].is_active && 
-            strcmp(users[i].username, username) == 0 && 
+        if (users[i].is_active &&
+            strcmp(users[i].username, username) == 0 &&
             strcmp(users[i].password, password) == 0)
         {
             current_user = &users[i];
@@ -998,7 +998,7 @@ int authenticate_user()
 void login_menu()
 {
     clear_screen();
-    
+
     printf("    ███████╗███╗   ███╗██████╗ ██╗      ██████╗ ██╗   ██╗███████╗███████╗    ███╗   ███╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗██████╗ \n");
     printf("    ██╔════╝████╗ ████║██╔══██╗██║     ██╔═══██╗╚██╗ ██╔╝██╔════╝██╔════╝    ████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝ ██╔════╝██╔══██╗\n");
     printf("    █████╗  ██╔████╔██║██████╔╝██║     ██║   ██║ ╚████╔╝ █████╗  █████╗      ██╔████╔██║███████║██╔██╗ ██║███████║██║  ███╗█████╗  ██████╔╝\n");
@@ -1007,32 +1007,16 @@ void login_menu()
     printf("    ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝\n");
     printf("\n");
 
-    printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
-    printf("║                              LOGIN REQUIRED                               ║\n");
-    printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
-    printf("\n");
-    
-    // Check if users were loaded successfully
-    if (user_count == 0) {
-        printf("ERROR: No user accounts found in users.txt!\n");
-        printf("Please ensure users.txt exists and contains valid user data.\n");
-        pause();
-        return;
-    }
-    
-    printf("Users loaded: %d accounts found\n", user_count);
-    printf("\n");
-    
     int attempts = 0;
     const int max_attempts = 3;
-    
+
     while (attempts < max_attempts && !is_logged_in)
     {
         if (attempts > 0)
         {
             printf("\nLogin failed! Attempts remaining: %d\n", max_attempts - attempts);
         }
-        
+
         if (authenticate_user())
         {
             printf("\nLogin successful!\n");
@@ -1048,17 +1032,15 @@ void login_menu()
                 printf("\nInvalid username or password!\n");
                 pause();
                 clear_screen();
-                
-                // Show login form again
+
                 printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
-                printf("║                              LOGIN REQUIRED                              ║\n");
+                printf("║                              LOGIN REQUIRED                               ║\n");
                 printf("╚═══════════════════════════════════════════════════════════════════════════╝\n");
-                printf("\nUsers loaded: %d accounts found\n", user_count);
                 printf("\n");
             }
         }
     }
-    
+
     if (attempts >= max_attempts)
     {
         printf("\nMaximum login attempts exceeded. Exiting system...\n");
@@ -1071,45 +1053,36 @@ void change_password()
     char current_password[MAX_PASSWORD];
     char new_password[MAX_PASSWORD];
     char confirm_password[MAX_PASSWORD];
-    
+
     printf("\n============================================\n");
     printf("            CHANGE PASSWORD                 \n");
     printf("============================================\n");
-    
+
     printf("Current Password: ");
     scanf("%s", current_password);
-    
-    // Verify current password
+
     if (strcmp(current_user->password, current_password) != 0)
     {
         printf("\nCurrent password is incorrect!\n");
-        return;
+        pause();
     }
-    
+
     printf("New Password: ");
     scanf("%s", new_password);
-    
+
     printf("Confirm New Password: ");
     scanf("%s", confirm_password);
-    
-    // Check if passwords match
+
     if (strcmp(new_password, confirm_password) != 0)
     {
         printf("\nNew passwords do not match!\n");
-        return;
+        pause();
     }
-    
-    // Check password length
-    if (strlen(new_password) < 6)
-    {
-        printf("\nPassword must be at least 6 characters long!\n");
-        return;
-    }
-    
-    // Update password
+
     strcpy(current_user->password, new_password);
     printf("\nPassword changed successfully!\n");
-    printf("Remember to save data (option 11) to keep the new password!\n");
+    printf("Remember to save and exit (option 10) to keep the new password!\n");
+    pause();
 }
 
 void logout()
@@ -1117,23 +1090,20 @@ void logout()
     printf("\n============================================\n");
     printf("                 LOGOUT                     \n");
     printf("============================================\n");
-    
+
     printf("Goodbye, %s!\n", current_user->username);
     current_user = NULL;
     is_logged_in = 0;
-    
+
     printf("You have been logged out successfully.\n");
     pause();
 }
 
-int has_permission(const char* required_role)
+int has_permission(const char *required_role)
 {
     if (!current_user || !is_logged_in)
         return 0;
-    
-   
-    
-    // Check if user has the required role
+
     return (strcmp(current_user->role, required_role) == 0);
 }
 
@@ -1142,7 +1112,6 @@ void save_users_to_file()
     FILE *user_file = fopen("users.txt", "w");
     if (user_file)
     {
-        // Save in clean format: user count first, then user data
         fprintf(user_file, "%d\n", user_count);
         for (int i = 0; i < user_count; i++)
         {
@@ -1153,7 +1122,6 @@ void save_users_to_file()
                     users[i].is_active);
         }
         fclose(user_file);
-        printf("User data saved to users.txt\n");
     }
     else
     {
@@ -1164,7 +1132,7 @@ void save_users_to_file()
 void load_users_from_file()
 {
     printf("DEBUG: Function load_users_from_file() called\n");
-    
+
     FILE *user_file = fopen("users.txt", "r");
     if (!user_file)
     {
@@ -1172,10 +1140,9 @@ void load_users_from_file()
         user_count = 0;
         return;
     }
-    
+
     printf("DEBUG: File opened successfully\n");
-    
-    // Read user count from first line
+
     if (fscanf(user_file, "%d", &user_count) != 1)
     {
         printf("Error: Invalid user count in users.txt\n");
@@ -1183,23 +1150,22 @@ void load_users_from_file()
 
         return;
     }
-    
+
     printf("DEBUG: User count read: %d\n", user_count);
-    int count=0;
+    int count = 0;
     while (fscanf(user_file, "%s %s %s %d",
-                users[count].username,
-                users[count].password,
-                users[count].role,
-                &users[count].is_active) == 4)
+                  users[count].username,
+                  users[count].password,
+                  users[count].role,
+                  &users[count].is_active) == 4)
     {
 
         count++;
-        if(count >= user_count) break;
+        if (count >= user_count)
+            break;
     }
 
-
-    
     fclose(user_file);
-    
+
     printf("DEBUG: Users loaded successfully\n");
 }
