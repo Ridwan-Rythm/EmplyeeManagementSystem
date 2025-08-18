@@ -202,41 +202,6 @@ int main() // Nazifa
     return 0;
 }
 
-/*void show_menu()
-{
-    clear_screen();
-    printf(" _____                 _                                      \n");
-    printf("| ____|_ __ ___  _ __ | | ___  _   _  ___  ___                \n");
-    printf("|  _| | '_ ` _ \\| '_ \\| |/ _ \\| | | |/ _ \\/ _ \\               \n");
-    printf("| |___| | | | | | |_) | | (_) | |_| |  __/  __/               \n");
-    printf("|_____|_| |_| |_| .__/|_|\\___/ \\__, |\\___|\\___|           _   \n");
-    printf("|  \\/  | __ _ _ |_|  __ _  __ _|___/ _ __ ___   ___ _ __ | |_ \n");
-    printf("| |\\/| |/ _` | '_ \\ / _` |/ _` |/ _ \\ '_ ` _ \\ / _ \\ '_ \\| __|\n");
-    printf("| |  | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_ \n");
-    printf("|_|__|_|\\__,_|_| |_|\\__,_|\\__, |\\___|_| |_| |_|\\___|_| |_|\\__|\n");
-    printf("/ ___| _   _ ___| |_ ___ _|___/__                             \n");
-    printf("\\___ \\| | | / __| __/ _ \\ '_ ` _ \\                            \n");
-    printf(" ___) | |_| \\__ \\ ||  __/ | | | | |                           \n");
-    printf("|____/ \\__, |___/\\__\\___|_| |_| |_|                           \n");
-    printf("       |___/                                                  \n");
-
-    printf("+------------------------------+ +------------------------------+\n");
-    printf("| 1. Add New Employee          | | 2. View All Employees        |\n");
-    printf("+------------------------------+ +------------------------------+\n");
-
-    printf("+------------------------------+ +------------------------------+\n");
-    printf("| 3. Update Employee Details   | | 4. Delete Employee           |\n");
-    printf("+------------------------------+ +------------------------------+\n");
-
-    printf("+------------------------------+ +------------------------------+\n");
-    printf("| 5. Mark Daily Attendance     | | 6. View Attendance Records   |\n");
-    printf("+------------------------------+ +------------------------------+\n");
-
-    printf("+------------------------------+ +------------------------------+\n");
-    printf("| 7. Calculate Payroll         | | 8. Save & Exit               |\n");
-    printf("+------------------------------+ +------------------------------+\n");
-}*/
-
 void show_menu()
 {
     clear_screen();
@@ -1167,10 +1132,6 @@ int has_permission(const char *required_role)
 {
     if (!current_user || !is_logged_in)
         return 0;
-
-    // Admin has access to everything
-    if (strcmp(current_user->role, "ADMIN") == 0)
-        return 1;
 
     // Check if user has the required role
     return (strcmp(current_user->role, required_role) == 0);
