@@ -295,6 +295,15 @@ void view_employees()
                    "Active");
             active_count++;
         }
+        if (!employees[i].is_active)
+        {
+            printf("%-5.3d %-25s %-20s $%-14.2f %-8s\n",
+                   employees[i].emp_id,
+                   employees[i].name,
+                   employees[i].position,
+                   employees[i].hourly_salary,
+                   "Inctive");
+        }
     }
     printf("---------------------------------------------------------------------------\n");
     printf("\nTotal Active Employees: %d\n", active_count);
@@ -517,6 +526,187 @@ void save_to_file()
                     attendance_records[i].excused);
         }
         fclose(att_file);
+    }
+    // Save payroll data
+    FILE *payroll_file = fopen("payroll_report.txt", "w");
+    if (payroll_file)
+    {
+        fprintf(payroll_file, "Employee Management System - Payroll Report\n");
+        fprintf(payroll_file, "============================================\n");
+
+        // Find all unique months from attendance records
+        char months[100][8];
+        int month_count = 0;
+
+        for (int i = 0; i < attendance_count; i++)
+        {
+            char record_month[8];
+            strcpy(record_month, &attendance_records[i].date[3]);
+
+            int found = 0;
+            for (int j = 0; j < month_count; j++)
+            {
+                if (strcmp(months[j], record_month) == 0)
+                {
+                    found = 1;
+                    break;
+                }
+            }
+
+            if (!found && month_count < 100)
+            {
+                strcpy(months[month_count], record_month);
+                month_count++;
+            }
+        }
+
+        // Generate payroll for each month
+        for (int m = 0; m < month_count; m++)
+        {
+            fprintf(payroll_file, "\n============================================\n");
+            fprintf(payroll_file, "           PAYROLL FOR %s             \n", months[m]);
+            fprintf(payroll_file, "============================================\n");
+            fprintf(payroll_file, "%-5s %-25s %-12s %-6s %-10s %-12s %-12s %-12s %-12s\n",
+                    "ID", "Name", "Hourly-Rate", "Days", "Reg Hours", "Overtime-Pay", "Penalties", "Gross-Pay", "Net-Pay");
+            fprintf(payroll_file, "------------------------------------------------------------------------------------------------------------\n");
+
+            float total_payroll = 0;
+
+            for (int i = 0; i < employee_count; i++)
+            {
+                if (employees[i].is_active)
+                {
+                    float total_hours = 0;
+                    int present_days = 0;
+                    int unexcused_absences = 0;
+
+                    for (int j = 0; j < attendance_count; j++)
+                    {
+                        if (attendance_records[j].emp_id == employees[i].emp_id)
+                        {
+                            char record_month[8];
+                            strcpy(record_month, &attendance_records[j].date[3]);
+
+                            if (strcmp(record_month, months[m]) == 0)
+                            {
+                                if (attendance_records[j].present)
+                                {
+                                    present_days++;
+                                    total_hours += attendance_records[j].hours_worked;
+                                }
+                                else if (!attendance_records[j].excused)
+                                {
+                                    unexcused_absences++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (present_days > 0 || unexcused_absences > 0)
+                    {
+                        float standard_hours = present_days * 8.0;
+                        float regular_hours = (total_hours <= standard_hours) ? total_hours : standard_hours;
+                        float overtime_hours = (total_hours > standard_hours) ? (total_hours - standard_hours) : 0;
+
+                        float regular_pay = regular_hours * employees[i].hourly_salary;
+                        float overtime_pay = overtime_hours * employees[i].hourly_salary * 1.5;
+                        float gross_pay = regular_pay + overtime_pay;
+
+                        float penalty_per_absence = 8.0 * employees[i].hourly_salary;
+                        float total_penalties = unexcused_absences * penalty_per_absence;
+
+                        float net_pay = gross_pay - total_penalties;
+
+                        if (net_pay < 0)
+                        {
+                            net_pay = 0;
+                        }
+
+                        fprintf(payroll_file, "%-5.3d %-25s $%-11.2f %-6d %-10.1f $%-11.2f $%-11.2f $%-11.2f $%-11.2f\n",
+                                employees[i].emp_id,
+                                employees[i].name,
+                                employees[i].hourly_salary,
+                                present_days,
+                                regular_hours,
+                                overtime_pay,
+                                total_penalties,
+                                gross_pay,
+                                net_pay);
+
+                        total_payroll += net_pay;
+                    }
+                }
+            }
+
+            fprintf(payroll_file, "------------------------------------------------------------------------------------------------------------\n");
+            fprintf(payroll_file, "TOTAL PAYROLL FOR %s: $%.2f\n", months[m], total_payroll);
+        }
+
+        fprintf(payroll_file, "\n\nRaw Data (for system loading):\n");
+        fprintf(payroll_file, "%d\n", month_count);
+        for (int m = 0; m < month_count; m++)
+        {
+            for (int i = 0; i < employee_count; i++)
+            {
+                if (employees[i].is_active)
+                {
+                    float total_hours = 0;
+                    int present_days = 0;
+                    int unexcused_absences = 0;
+
+                    for (int j = 0; j < attendance_count; j++)
+                    {
+                        if (attendance_records[j].emp_id == employees[i].emp_id)
+                        {
+                            char record_month[8];
+                            strcpy(record_month, &attendance_records[j].date[3]);
+
+                            if (strcmp(record_month, months[m]) == 0)
+                            {
+                                if (attendance_records[j].present)
+                                {
+                                    present_days++;
+                                    total_hours += attendance_records[j].hours_worked;
+                                }
+                                else if (!attendance_records[j].excused)
+                                {
+                                    unexcused_absences++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (present_days > 0 || unexcused_absences > 0)
+                    {
+                        float standard_hours = present_days * 8.0;
+                        float regular_hours = (total_hours <= standard_hours) ? total_hours : standard_hours;
+                        float overtime_hours = (total_hours > standard_hours) ? (total_hours - standard_hours) : 0;
+
+                        float regular_pay = regular_hours * employees[i].hourly_salary;
+                        float overtime_pay = overtime_hours * employees[i].hourly_salary * 1.5;
+                        float gross_pay = regular_pay + overtime_pay;
+
+                        float penalty_per_absence = 8.0 * employees[i].hourly_salary;
+                        float total_penalties = unexcused_absences * penalty_per_absence;
+
+                        float net_pay = gross_pay - total_penalties;
+                        if (net_pay < 0)
+                            net_pay = 0;
+
+                        fprintf(payroll_file, "%s|%03d|%d|%.2f|%.2f|%.2f|%.2f|%.2f\n",
+                                months[m],
+                                employees[i].emp_id,
+                                present_days,
+                                regular_hours,
+                                overtime_hours,
+                                gross_pay,
+                                total_penalties,
+                                net_pay);
+                    }
+                }
+            }
+        }
+        fclose(payroll_file);
     }
 }
 
@@ -861,7 +1051,7 @@ void calculate_payroll()
     printf("           PAYROLL FOR %s             \n", month);
     printf("============================================\n");
     printf("%-5s %-25s %-12s %-6s %-10s %-12s %-12s %-12s %-12s\n",
-           "ID", "Name", "Hourly Rate", "Days", "Reg Hours", "Overtime Pay", "Penalties", "Gross Pay", "Net Pay");
+           "ID", "Name", "Hourly-Rate", "Days", "Reg-Hours", "Overtime-Pay", "Penalties", "Gross-Pay", "Net-Pay");
     printf("------------------------------------------------------------------------------------------------------------\n");
 
     float total_payroll = 0;
