@@ -32,6 +32,7 @@ typedef struct
     int is_active;
 } Employee;
 
+// Attendance {Shams}
 typedef struct
 {
     int emp_id;
@@ -45,6 +46,8 @@ Employee employees[MAX_EMPLOYEES];
 Attendance attendance_records[MAX_ATTENDANCE];
 int employee_count = 0;
 int attendance_count = 0;
+
+// Attendance End
 
 // Authentication functions{Moballig}
 void initialize_default_users();
