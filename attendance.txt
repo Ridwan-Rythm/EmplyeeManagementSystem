@@ -1,11 +1,13 @@
 Employee Management System - Attendance Records
 ================================================
-Total Records: 0
+Total Records: 1
 
 Emp ID   Employee Name             Date         Hours    Status     Absence Type   
 --------------------------------------------------------------------------------
+001      moballig                  22/08/2025   0.00     Absent     Excused        
 --------------------------------------------------------------------------------
 
 
 Raw Data (for system loading):
-0
+1
+001|22/08/2025|0.00|0|1

@@ -50,7 +50,6 @@ int attendance_count = 0;
 // Attendance End
 
 // Authentication functions{Moballig}
-void initialize_default_users();
 int authenticate_user();
 void login_menu();
 void change_password();
@@ -1276,7 +1275,7 @@ void change_password()
 
     strcpy(current_user->password, new_password);
     printf("\nPassword changed successfully!\n");
-    printf("Remember to save and exit (option 10) to keep the new password!\n");
+    save_users_to_file();
     pause();
 }
 

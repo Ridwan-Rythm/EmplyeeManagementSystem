@@ -1,11 +1,17 @@
 Employee Management System - Employee Records
 ==============================================
-Total Employees: 0
+Total Employees: 3
 
 ID    Name                      Position             Hourly Rate     Status  
 -----------------------------------------------------------------------
+001   moballig                  project lead         $12.00          Active  
+002   shams                     CEO                  $15.00          Active  
+003   redwan                    CTO                  $12.00          Inactive
 -----------------------------------------------------------------------
 
 
 Raw Data (for system loading):
-0
+3
+001|moballig|project lead|12.00|1
+002|shams|CEO|15.00|1
+003|redwan|CTO|12.00|0
